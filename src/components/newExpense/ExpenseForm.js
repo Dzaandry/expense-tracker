@@ -1,18 +1,18 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import "./ExpenseForm.css";
 
 const ExpenseForm = function (props) {
-  const [enteredTitle, setEnteredTitle] = useState("");
-  const [enteredAmount, setEnteredAmount] = useState("");
-  const [enteredDate, setEnteredDate] = useState("");
   const [isValidTitle, setIsValidTitle] = useState(true);
   const [isValidAmount, setIsValidAmount] = useState(true);
   const [isValidDate, setIsValidDate] = useState(true);
+  const titleRef = useRef();
+  const amountRef = useRef();
+  const dateRef = useRef();
 
   const resetStates = () => {
-    setEnteredTitle("");
-    setEnteredAmount("");
-    setEnteredDate("");
+    titleRef.current.value = "";
+    amountRef.current.value = "";
+    dateRef.current.value = "";
     setIsValidTitle(true);
     setIsValidAmount(true);
     setIsValidDate(true);
@@ -31,41 +31,35 @@ const ExpenseForm = function (props) {
     // setUserInput((prevState) => {
     //   return { ...prevState, enteredTitle: event.target.value };
     // });
-    if (event.target.value.trim().length > 0) {
-      setIsValidTitle(true);
-    }
-    setEnteredTitle(event.target.value);
+    if (event.target.value.trim().length > 0) setIsValidTitle(true);
   };
   const amountChangeHandler = function (event) {
-    if (event.target.value) {
-      setIsValidAmount(true);
-    }
-    setEnteredAmount(event.target.value);
+    if (event.target.value) setIsValidAmount(true);
   };
   const dateChangeHandler = function (event) {
-    if (event.target.value) {
-      setIsValidDate(true);
-    }
-    setEnteredDate(event.target.value);
+    if (event.target.value) setIsValidDate(true);
   };
   const submitHandler = function (e) {
     e.preventDefault();
-    if (!enteredTitle) {
+    if (!titleRef.current.value) {
       setIsValidTitle(false);
+      titleRef.current.focus();
       return;
     }
-    if (!enteredAmount) {
+    if (!amountRef.current.value) {
       setIsValidAmount(false);
+      amountRef.current.focus();
       return;
     }
-    if (!enteredDate) {
+    if (!dateRef.current.value) {
+      dateRef.current.focus();
       setIsValidDate(false);
       return;
     }
     const expenseData = {
-      title: enteredTitle,
-      amount: +enteredAmount,
-      date: new Date(enteredDate),
+      title: titleRef.current.value,
+      amount: +amountRef.current.value,
+      date: new Date(dateRef.current.value),
     };
     props.onSaveExpenseData(expenseData);
     resetStates();
@@ -78,31 +72,27 @@ const ExpenseForm = function (props) {
           className={`new-expense__control ${isValidTitle ? "" : "invalid"}`}
         >
           <label>Title</label>
-          <input
-            type="text"
-            value={enteredTitle}
-            onChange={titleChangeHandler}
-          />
+          <input ref={titleRef} type="text" onChange={titleChangeHandler} />
         </div>
         <div
           className={`new-expense__control ${isValidAmount ? "" : "invalid"}`}
         >
           <label>Amount</label>
           <input
+            ref={amountRef}
             type="number"
             min="0.01"
             step="0.01"
-            value={enteredAmount}
             onChange={amountChangeHandler}
           />
         </div>
         <div className={`new-expense__control ${isValidDate ? "" : "invalid"}`}>
           <label>Date</label>
           <input
+            ref={dateRef}
             type="date"
             min="2019-01-01"
             max="2022-12-31"
-            value={enteredDate}
             onChange={dateChangeHandler}
           />
         </div>
